@@ -6,35 +6,124 @@
 </head>
 <body>
 
-   <div class="navbar">
-    <h2>Rezowan Shop 🛒</h2>
-    <div>
-
-        <a href="cart.html" class="cart-btn">Cart 🛒</a>
-    </div>
-</div>
-<div class="products-container">
-    <div class="products">
-        <div class="product">
-            <img src="images/shirt.jpg" class="product-img">
-            <h3>Stylish Shirt</h3>
-            <p class="price">500৳</p>
-            <button onclick="addToCart('Stylish Shirt', 500, 'images/shirt.jpg')">Add to Cart</button>
-        </div>
-
-        <div class="product">
-            <img src="images/shoes.jpg" class="product-img">
-            <h3>Running Shoes</h3>
-            <p class="price">1200৳</p>
-            <button onclick="addToCart('Running Shoes', 1200, 'images/shoes.jpg')">Add to Cart</button>
-        </div>
-    </div>
+  <div class="products">
+  <div class="product" data-id="1" data-name="Stylish Shirt" data-price="500" data-img="assets/shirt.jpg">
+  <img class="product-img" src="images/shirt.jpg" alt="Stylish Shirt">
+  <h4>Stylish Shirt</h4>
+  <p>500৳</p>
+  <button class="add-to-cart">Add to Cart</button>
 </div>
 
-    <h2>Cart Items: <span id="cart-count">0</span></h2>
-    
-    
+<div class="product" data-id="2" data-name="Running Shoes" data-price="1200" data-img="assets/shoes.jpg">
+  <img class="product-img" src="images/shoes.jpg" alt="Running Shoes">
+  <h4>Running Shoes</h4>
+  <p>1200৳</p>
+  <button class="add-to-cart">Add to Cart</button>
+</div>
 
-<script src="script.js"></script>
+</div>
+
+<!-- Cart summary / panel -->
+<div id="cartSummary" class="cart-summary">
+  <div class="cart-header">
+    <strong>Cart Items:</strong> <span id="cartCount">0</span>
+    <button id="toggleCart">View</button>
+  </div>
+  <div id="cartItems" class="cart-items hidden"></div>
+  <div class="cart-footer">
+    <strong>Total:</strong> <span id="cartTotal">0৳</span>
+  </div>
+</div>
+
+<script>
+/* Cart helper functions */
+function getCart() {
+  return JSON.parse(localStorage.getItem('cart') || '[]');
+}
+function saveCart(cart) {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+/* Add product to cart (increments quantity if same id) */
+function addToCart(product) {
+  const cart = getCart();
+  const idx = cart.findIndex(p => p.id === product.id);
+  if (idx > -1) {
+    cart[idx].qty += 1;
+  } else {
+    cart.push({ ...product, qty: 1 });
+  }
+  saveCart(cart);
+  updateCartUI();
+}
+
+/* Remove item */
+function removeFromCart(id) {
+  let cart = getCart();
+  cart = cart.filter(p => p.id !== id);
+  saveCart(cart);
+  updateCartUI();
+}
+
+/* Update cart count, list and total */
+function updateCartUI() {
+  const cart = getCart();
+  const count = cart.reduce((s, p) => s + p.qty, 0);
+  document.getElementById('cartCount').innerText = count;
+
+  const itemsEl = document.getElementById('cartItems');
+  itemsEl.innerHTML = '';
+  let total = 0;
+  if (cart.length === 0) {
+    itemsEl.innerHTML = '<p class="empty">Your cart is empty.</p>';
+  } else {
+    cart.forEach(item => {
+      total += item.qty * Number(item.price);
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.innerHTML = `
+        <img src="${item.img}" alt="${item.name}" class="cart-thumb">
+        <div class="cart-meta">
+          <div class="cart-name">${item.name}</div>
+          <div class="cart-qty">Qty: ${item.qty}</div>
+          <div class="cart-price">${item.price}৳</div>
+        </div>
+        <button class="cart-remove" data-id="${item.id}">Remove</button>
+      `;
+      itemsEl.appendChild(div);
+    });
+  }
+  document.getElementById('cartTotal').innerText = total + '৳';
+
+  // attach remove handlers
+  document.querySelectorAll('.cart-remove').forEach(btn => {
+    btn.onclick = () => removeFromCart(btn.dataset.id);
+  });
+}
+
+/* Wire up Add to Cart buttons and toggle */
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const p = e.target.closest('.product');
+      const product = {
+        id: p.dataset.id,
+        name: p.dataset.name,
+        price: p.dataset.price,
+        img: p.dataset.img
+      };
+      addToCart(product);
+    });
+  });
+
+  document.getElementById('toggleCart').addEventListener('click', () => {
+    document.getElementById('cartItems').classList.toggle('hidden');
+  });
+
+  // initialize UI from localStorage
+  updateCartUI();
+});
+</script>
+
 </body>
 </html>
