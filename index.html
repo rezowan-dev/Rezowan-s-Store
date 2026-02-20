@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Shop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+   <div class="navbar">
+    <h2>Rezowan Shop 🛒</h2>
+    <div>
+
+        <a href="cart.html" class="cart-btn">Cart 🛒</a>
+    </div>
+</div>
+<div class="products-container">
+    <div class="products">
+        <div class="product">
+            <img src="images/shirt.jpg" class="product-img">
+            <h3>Stylish Shirt</h3>
+            <p class="price">500৳</p>
+            <button onclick="addToCart('Stylish Shirt', 500, 'images/shirt.jpg')">Add to Cart</button>
+        </div>
+
+        <div class="product">
+            <img src="images/shoes.jpg" class="product-img">
+            <h3>Running Shoes</h3>
+            <p class="price">1200৳</p>
+            <button onclick="addToCart('Running Shoes', 1200, 'images/shoes.jpg')">Add to Cart</button>
+        </div>
+    </div>
+</div>
+
+    <h2>Cart Items: <span id="cart-count">0</span></h2>
+    
+    
+
+<script src="script.js"></script>
+</body>
+</html>
